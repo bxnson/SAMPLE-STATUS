@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Sample Lookup</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        input { padding: 8px; width: 200px; }
+        button { padding: 8px; }
+        pre { background: #f5f5f5; padding: 15px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Sample Lookup</h1>
+    <p>Enter sample name to search:</p>
+    <input id="sample" placeholder="NHẬP TÊN MẪU">
+    <button onclick="search()">Search</button>
+
+    <h3>Result:</h3>
+    <pre id="result">No search yet</pre>
+
+<script>
+async function search() {
+    let sampleName = document.getElementById("sample").value.trim();
+    if (!sampleName) {
+        alert("Please enter a sample name");
+        return;
+    }
+
+    // ---- Replace YOUR_SPREADSHEET_ID with your Google Sheet ID ----
+    let sheetId = "1KE4r564fe0shUBdYhTvik1RzyK2pXhfN_Oz46PcmOeE";
+    let sheetName = "CLIENT";  // Change if your sheet name is different
+    let url = `https://opensheet.elk.sh/${sheetId}/${sheetName}`;
+
+    try {
+        let response = await fetch(url);
+        let data = await response.json();
+
+        let row = data.find(r => r.SAMPLE.toLowerCase() === sampleName.toLowerCase());
+
+        if (row) {
+            // Display all columns nicely
+            let display = "";
+            for (let key in row) {
+                display += `${key}: ${row[key]}\n`;
+            }
+            document.getElementById("result").textContent = display;
+        } else {
+            document.getElementById("result").textContent = "Sample not found";
+        }
+    } catch (err) {
+        console.error(err);
+        document.getElementById("result").textContent = "Error fetching data";
+    }
+}
+</script>
+</body>
+</html>
